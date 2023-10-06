@@ -18,11 +18,15 @@ public class CameraController : MonoBehaviour
     void FixedUpdate()
     {
         // Positioning camera in Isometrci view.
-        //transform.position = player.transform.position + cameraOffset;
+        transform.position = player.transform.position + cameraOffset;
 
-        Debug.Log(player.transform.rotation.eulerAngles.y);
-        Vector3 offset = Quaternion.AngleAxis(player.transform.rotation.eulerAngles.y * player.GetComponent<PlayerController>().turningSpeed, Vector3.up) * cameraOffset;
-        transform.position = player.transform.position + offset;
+        Vector3 relativePos = player.transform.position - transform.position;
+        Quaternion reotation = Quaternion.LookRotation(relativePos, Vector3.up);
+        transform.rotation = reotation;
+
+        //Debug.Log(player.transform.rotation.eulerAngles.y);
+        //Vector3 offset = Quaternion.AngleAxis(player.transform.rotation.eulerAngles.y * player.GetComponent<PlayerController>().turningSpeed, Vector3.up) * cameraOffset;
+        //transform.position = player.transform.position + offset;
         transform.LookAt(player.transform.position);
     }
 
