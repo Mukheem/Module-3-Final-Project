@@ -13,11 +13,14 @@ public class PlayerController : MonoBehaviour
     // Component Variables
     private Animator playerAnimator;
 
+    // Misellaneous
+    public float gravityModifier;
 
     // Start is called before the first frame update
     void Start()
     {
         playerAnimator = GetComponent<Animator>();
+        Physics.gravity *= gravityModifier;
     }
 
     // Update is called once per frame
