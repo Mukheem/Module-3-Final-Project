@@ -31,7 +31,7 @@ public class CameraController : MonoBehaviour
         // Positioning camera in Isometrci view.
         transform.position = player.transform.position + cameraOffset;
 
-
+        // Code reference: https://stackoverflow.com/questions/56382451/how-to-rotate-camera-around-player-in-unity-c-sharp
         Vector3 offset = Quaternion.AngleAxis(player.transform.rotation.eulerAngles.y * player.GetComponent<PlayerController>().turningSpeed, Vector3.up) * cameraOffset;
         transform.position = player.transform.position + offset;
         transform.LookAt(player.transform.position);
