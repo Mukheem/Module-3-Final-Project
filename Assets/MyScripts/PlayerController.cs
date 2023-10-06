@@ -38,7 +38,7 @@ public class PlayerController : MonoBehaviour
             playerAnimator.SetFloat("Speed_f", movingSpeed);
            
         }
-        if (Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.DownArrow)){
+        else if (Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.DownArrow)){
             playerAnimator.SetBool("Static_b", true);
             playerAnimator.SetFloat("Speed_f", 0);
         }
