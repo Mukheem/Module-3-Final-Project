@@ -3,7 +3,14 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Powerup-Money
+  - Powerup-Apple
+  - Powerup-Bottle
+  - Powerup-Cake
+  - Powerup-Cookie
+  - Powerup-Milk
+  - Powerup-WaterMelon
   layers:
   - Default
   - TransparentFX

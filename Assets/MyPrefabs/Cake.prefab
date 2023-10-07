@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8867818783547021816}
   m_Layer: 0
   m_Name: Cake
-  m_TagString: Untagged
+  m_TagString: Powerup-Cake
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

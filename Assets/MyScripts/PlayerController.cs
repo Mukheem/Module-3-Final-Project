@@ -152,6 +152,15 @@ public class PlayerController : MonoBehaviour
             playerHealth.BarBackGroundColor = Color.grey;
         }
     }
+
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.tag.StartsWith("Powerup"))
+        {
+            Destroy(other.gameObject);
+        }
+    }
 }
 
 // transform.Rotate(Vector3.up,horizontalMovement * turningSpeed * Time.deltaTime); -- Not working
