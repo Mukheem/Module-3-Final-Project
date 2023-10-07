@@ -1,5 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
+using TMPro;
+using UnityEngine.SceneManagement;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -12,15 +15,27 @@ public class PlayerController : MonoBehaviour
 
     // Component Variables
     private Animator playerAnimator;
+    public ParticleSystem playerExplosionParticleFX;
 
     // Misellaneous
     public float gravityModifier;
+    public ProgressBarCircle playerHealth;
+    private int playerHealthCountdownTimeLimit = 8; //Every 8 seconds, Player looses his/her health.
+    public bool isGameOver;
+    
 
     // Start is called before the first frame update
     void Start()
     {
         playerAnimator = GetComponent<Animator>();
         Physics.gravity *= gravityModifier;
+
+        playerHealth.BarValue = 1;//Health value Initialisation
+        StartCoroutine("PlayerHealthCounter");
+
+        isGameOver = false;
+
+
     }
 
     // Update is called once per frame
@@ -31,26 +46,87 @@ public class PlayerController : MonoBehaviour
         forwardMovement = Input.GetAxis("Vertical");
 
         transform.Translate(Vector3.forward * Time.deltaTime * movingSpeed * forwardMovement);
-
         transform.Rotate(Vector3.up, horizontalMovement * turningSpeed);
 
 
+
+
         // This condition controls the animation of the player while moving.
-        if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow))
+        if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.S))
         {
             playerAnimator.SetBool("Static_b", false);
             playerAnimator.SetFloat("Speed_f", movingSpeed);
            
         }
-        else if (Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.DownArrow)){
+        else if (Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.DownArrow) || Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.S))
+        {
             playerAnimator.SetBool("Static_b", true);
             playerAnimator.SetFloat("Speed_f", 0);
         }
        
         
     }
+
+    // CO-Routine to handle health Counter
+    IEnumerator PlayerHealthCounter()
+    {
+        while (playerHealth.BarValue > 0)
+        {
+            yield return new WaitForSeconds(playerHealthCountdownTimeLimit);
+            playerHealth.BarValue -= 1;
+
+            // Health Bar color codes and conditions
+            if(playerHealth.BarValue > 75 && playerHealth.BarValue < 91)
+            {
+                playerHealth.BarBackGroundColor = new Color(56, 255, 33, 255); // Lush Green
+                
+            }
+            else if (playerHealth.BarValue > 50 && playerHealth.BarValue < 76)
+            {
+                playerHealth.BarBackGroundColor = new Color(0, 174, 215, 255); // Sky Blue
+            }
+            else if (playerHealth.BarValue > 35 && playerHealth.BarValue < 51)
+            {
+                playerHealth.BarBackGroundColor = new Color(244, 255, 0, 255); // Yellow
+            }
+            else if (playerHealth.BarValue > 20 && playerHealth.BarValue < 36)
+            {
+                playerHealth.BarBackGroundColor = new Color(255, 154, 0, 255); // Orange
+            }
+            else if (playerHealth.BarValue < 21)
+            {
+                playerHealth.BarBackGroundColor = Color.red; // Red
+            }
+
+            //If Player's health is Zero then he dies 
+            if(playerHealth.BarValue == 0)
+            {
+                PlayerDeath();
+            }
+
+        }
+
+    }
+
+    // Player's death and other rituals are handled.
+    private void PlayerDeath()
+    {
+        // Play death Aimation
+        playerAnimator.SetBool("Death_b", true);
+        playerAnimator.SetInteger("DeathType_int", 1);
+        // Turning off the low-health indicating sound.
+        playerHealth.repeat = false;
+        playerHealth.sound = null;
+        // GameOver - Set to true
+        isGameOver = true;
+        // Playing Player Death Explosion FX
+        playerExplosionParticleFX.Play();
+        //Destroy Player
+        //Destroy(this.gameObject, 2.20f);
+    }
 }
 
 // transform.Rotate(Vector3.up,horizontalMovement * turningSpeed * Time.deltaTime); -- Not working
 // How to make the player stand on the ground/Snow
 // Why do we need Input.GetAxis when we can use Input.getKeyDown(up arrow)
+// Why do we use Public variable and drag + drop ; why do we use GetComponent<Type>();
