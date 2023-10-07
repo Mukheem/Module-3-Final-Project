@@ -16,13 +16,16 @@ public class PlayerController : MonoBehaviour
     // Component Variables
     private Animator playerAnimator;
     public ParticleSystem playerExplosionParticleFX;
+    public ParticleSystem playerDirtSplatterParticlFX;
+    private AudioSource gameBGM;
+
 
     // Misellaneous
     public float gravityModifier;
     public ProgressBarCircle playerHealth;
-    private int playerHealthCountdownTimeLimit = 8; //Every 8 seconds, Player looses his/her health.
+    private int playerHealthCountdownTimeLimit = 1; //Every 8 seconds, Player looses his/her health.
     public bool isGameOver;
-    
+
 
     // Start is called before the first frame update
     void Start()
@@ -30,11 +33,12 @@ public class PlayerController : MonoBehaviour
         playerAnimator = GetComponent<Animator>();
         Physics.gravity *= gravityModifier;
 
-        playerHealth.BarValue = 1;//Health value Initialisation
+        playerHealth.BarValue = 99;//Health value Initialisation
         StartCoroutine("PlayerHealthCounter");
 
         isGameOver = false;
 
+        gameBGM = GameObject.Find("Main Camera").GetComponent<AudioSource>();
 
     }
 
@@ -51,20 +55,24 @@ public class PlayerController : MonoBehaviour
 
 
 
-        // This condition controls the animation of the player while moving.
+        // This condition controls the animation and also DirtSPlatter of the player while moving.
         if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.S))
         {
             playerAnimator.SetBool("Static_b", false);
             playerAnimator.SetFloat("Speed_f", movingSpeed);
-           
+
+            playerDirtSplatterParticlFX.Play(); // Dirst Splatter Play
+
         }
         else if (Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.DownArrow) || Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.S))
         {
             playerAnimator.SetBool("Static_b", true);
             playerAnimator.SetFloat("Speed_f", 0);
+
+            playerDirtSplatterParticlFX.Stop(); // Dirst Splatter Stop
         }
-       
-        
+
+
     }
 
     // CO-Routine to handle health Counter
@@ -72,34 +80,13 @@ public class PlayerController : MonoBehaviour
     {
         while (playerHealth.BarValue > 0)
         {
+
             yield return new WaitForSeconds(playerHealthCountdownTimeLimit);
             playerHealth.BarValue -= 1;
-
-            // Health Bar color codes and conditions
-            if(playerHealth.BarValue > 75 && playerHealth.BarValue < 91)
-            {
-                playerHealth.BarBackGroundColor = new Color(56, 255, 33, 255); // Lush Green
-                
-            }
-            else if (playerHealth.BarValue > 50 && playerHealth.BarValue < 76)
-            {
-                playerHealth.BarBackGroundColor = new Color(0, 174, 215, 255); // Sky Blue
-            }
-            else if (playerHealth.BarValue > 35 && playerHealth.BarValue < 51)
-            {
-                playerHealth.BarBackGroundColor = new Color(244, 255, 0, 255); // Yellow
-            }
-            else if (playerHealth.BarValue > 20 && playerHealth.BarValue < 36)
-            {
-                playerHealth.BarBackGroundColor = new Color(255, 154, 0, 255); // Orange
-            }
-            else if (playerHealth.BarValue < 21)
-            {
-                playerHealth.BarBackGroundColor = Color.red; // Red
-            }
+            healthColurIndicator();
 
             //If Player's health is Zero then he dies 
-            if(playerHealth.BarValue == 0)
+            if (playerHealth.BarValue == 0)
             {
                 PlayerDeath();
             }
@@ -121,8 +108,42 @@ public class PlayerController : MonoBehaviour
         isGameOver = true;
         // Playing Player Death Explosion FX
         playerExplosionParticleFX.Play();
+        // Stop BGM
+        gameBGM.Stop();
+
         //Destroy Player
         //Destroy(this.gameObject, 2.20f);
+    }
+
+    // Health Bar color codes and conditions
+    private void healthColurIndicator()
+    {
+        
+        if (playerHealth.BarValue > 75 && playerHealth.BarValue < 91)
+        {
+            playerHealth.BarBackGroundColor = Color.green; // Olive Green
+
+        }
+        else if (playerHealth.BarValue > 50 && playerHealth.BarValue < 76)
+        {
+            playerHealth.BarBackGroundColor = new Color(0, 174, 215, 255); // Sky Blue
+        }
+        else if (playerHealth.BarValue > 35 && playerHealth.BarValue < 51)
+        {
+            playerHealth.BarBackGroundColor = new Color(244, 255, 0, 255); // Yellow
+        }
+        else if (playerHealth.BarValue > 20 && playerHealth.BarValue < 36)
+        {
+            playerHealth.BarBackGroundColor = Color.magenta; // magenta/Dark Pink
+        }
+        else if (playerHealth.BarValue < 21)
+        {
+            playerHealth.BarBackGroundColor = Color.red; // Red
+        }
+        else
+        {
+            playerHealth.BarBackGroundColor = Color.grey;
+        }
     }
 }
 
