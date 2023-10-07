@@ -18,6 +18,9 @@ public class PlayerController : MonoBehaviour
     public ParticleSystem playerExplosionParticleFX;
     public ParticleSystem playerDirtSplatterParticlFX;
     private AudioSource gameBGM;
+    public AudioClip playerDeathSound;
+    private AudioSource playerAudioSource;
+    
 
 
     // Misellaneous
@@ -39,6 +42,7 @@ public class PlayerController : MonoBehaviour
         isGameOver = false;
 
         gameBGM = GameObject.Find("Main Camera").GetComponent<AudioSource>();
+        playerAudioSource = GetComponent<AudioSource>();
 
     }
 
@@ -98,18 +102,21 @@ public class PlayerController : MonoBehaviour
     // Player's death and other rituals are handled.
     private void PlayerDeath()
     {
+        // GameOver - Set to true
+        isGameOver = true;
         // Play death Aimation
         playerAnimator.SetBool("Death_b", true);
         playerAnimator.SetInteger("DeathType_int", 1);
         // Turning off the low-health indicating sound.
         playerHealth.repeat = false;
         playerHealth.sound = null;
-        // GameOver - Set to true
-        isGameOver = true;
-        // Playing Player Death Explosion FX
-        playerExplosionParticleFX.Play();
         // Stop BGM
         gameBGM.Stop();
+        // Playing Player Death Explosion FX - Visual
+        playerExplosionParticleFX.Play(); 
+        // Playing Player Death Sound FX - Audio
+        playerAudioSource.PlayOneShot(playerDeathSound,1.0f);
+        
 
         //Destroy Player
         //Destroy(this.gameObject, 2.20f);
@@ -150,4 +157,4 @@ public class PlayerController : MonoBehaviour
 // transform.Rotate(Vector3.up,horizontalMovement * turningSpeed * Time.deltaTime); -- Not working
 // How to make the player stand on the ground/Snow
 // Why do we need Input.GetAxis when we can use Input.getKeyDown(up arrow)
-// Why do we use Public variable and drag + drop ; why do we use GetComponent<Type>();
+// Why/when do we use Public variable and drag + drop ; why do we use GetComponent<Type>();
