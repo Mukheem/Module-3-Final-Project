@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour
     private AudioSource gameBGM;
     public AudioClip playerDeathSound;
     private AudioSource playerAudioSource;
+    private SpawnManager spawnManager;
     
 
 
@@ -34,6 +35,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         playerAnimator = GetComponent<Animator>();
+        spawnManager = GameObject.Find("Spawn Manager").GetComponent<SpawnManager>();
         Physics.gravity *= gravityModifier;
 
         playerHealth.BarValue = 99;//Health value Initialisation
@@ -159,11 +161,13 @@ public class PlayerController : MonoBehaviour
         if (other.tag.StartsWith("Powerup"))
         {
             Destroy(other.gameObject);
+            spawnManager.hasOnePowerupInScene = false; //Letting know SpawnManager that there is no powerup in the scene.
         }
     }
 }
 
+// How to make the player stand on the ground/Snow and make physics work
+// Player Movement with Physics is not working
 // transform.Rotate(Vector3.up,horizontalMovement * turningSpeed * Time.deltaTime); -- Not working
-// How to make the player stand on the ground/Snow
 // Why do we need Input.GetAxis when we can use Input.getKeyDown(up arrow)
 // Why/when do we use Public variable and drag + drop ; why do we use GetComponent<Type>();
