@@ -6,7 +6,7 @@ public class CameraController : MonoBehaviour
 {
     public GameObject player;
    
-    public Vector3 cameraOffset = new Vector3(0,4.0f, -10.0f);
+    public Vector3 cameraOffset = new Vector3(0, 2.83f, -4.1f);
 
     // Start is called before the first frame update
     void Start()
@@ -32,9 +32,9 @@ public class CameraController : MonoBehaviour
         transform.position = player.transform.position + cameraOffset;
 
 
-        Vector3 offset = Quaternion.AngleAxis(player.transform.rotation.eulerAngles.y * player.GetComponent<PlayerController>().turningSpeed, Vector3.up) * cameraOffset;
-        transform.position = player.transform.position + offset;
-        transform.LookAt(player.transform.position);
+        //Vector3 offset = Quaternion.AngleAxis(player.transform.rotation.eulerAngles.y * player.GetComponent<PlayerController>().turningSpeed, Vector3.up) * cameraOffset;
+        //transform.position = player.transform.position + offset;
+        //transform.LookAt(player.transform.position);
 
 
     }

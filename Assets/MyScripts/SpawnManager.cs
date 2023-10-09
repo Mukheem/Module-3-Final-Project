@@ -75,6 +75,7 @@ public class SpawnManager : MonoBehaviour
 
 
     }
+
     private void instantiatePowerupOne()
     {
         float xAxisRangeStart = 87.0f;

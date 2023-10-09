@@ -4,14 +4,17 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
 using UnityEngine;
+using System.Linq;
 
 public class PlayerController : MonoBehaviour
 {
     //Movement Variables
     private float horizontalMovement;
     private float forwardMovement;
-    public float movingSpeed = 1;
-    public float turningSpeed = 1;
+    public float movingSpeed = 2000;
+    public float turningSpeed = 0.5f;
+    public float jumpSpeed = 50;
+    
 
     // Component Variables
     private Animator playerAnimator;
@@ -21,7 +24,8 @@ public class PlayerController : MonoBehaviour
     public AudioClip playerDeathSound;
     private AudioSource playerAudioSource;
     private SpawnManager spawnManager;
-    
+    private Rigidbody playerRB;
+    public float velocityLimit = 1.0f;
 
 
     // Misellaneous
@@ -29,14 +33,19 @@ public class PlayerController : MonoBehaviour
     public ProgressBarCircle playerHealth;
     private int playerHealthCountdownTimeLimit = 1; //Every 8 seconds, Player looses his/her health.
     public bool isGameOver;
+    public bool isPlayerOnGround;
+   
 
 
     // Start is called before the first frame update
     void Start()
     {
+        //Player Start Position 
+        //transform.position = new Vector3(98.0f, 24f, -65f);
         playerAnimator = GetComponent<Animator>();
         spawnManager = GameObject.Find("Spawn Manager").GetComponent<SpawnManager>();
         Physics.gravity *= gravityModifier;
+        playerRB = GetComponent<Rigidbody>();
 
         playerHealth.BarValue = 99;//Health value Initialisation
         StartCoroutine("PlayerHealthCounter");
@@ -48,6 +57,22 @@ public class PlayerController : MonoBehaviour
 
     }
 
+
+    private void FixedUpdate()
+    {
+        //if (Input.GetKeyUp(KeyCode.Space) && isPlayerOnGround && (Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.W)) )
+        //{
+        //    // Move the object forward along its z axis 1 unit/second.
+        //    transform.Translate(Vector3.forward * Time.deltaTime);
+
+        //    // Move the object upward in world space 1 unit/second.
+        //    transform.Translate(Vector3.up * Time.deltaTime * 10, Space.World);
+           
+
+
+        //}
+
+    }
     // Update is called once per frame
     void Update()
     {
@@ -55,29 +80,61 @@ public class PlayerController : MonoBehaviour
         horizontalMovement = Input.GetAxis("Horizontal");
         forwardMovement = Input.GetAxis("Vertical");
 
-        transform.Translate(Vector3.forward * Time.deltaTime * movingSpeed * forwardMovement);
+        // This condition controls the rotation of the player while moving.
         transform.Rotate(Vector3.up, horizontalMovement * turningSpeed);
 
 
 
+        //if (Input.GetKey(KeyCode.Space) && isPlayerOnGround && (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W)))
+        //{
+        //    Vector3 moveNew = new Vector3(transform.position.x,transform.position.y,transform.position.z);
+        //    Debug.Log("Inside Combination");
+        //    isPlayerOnGround = false;
+        //    playerRB.AddForce(transform.up * Time.deltaTime * jumpSpeed, ForceMode.Impulse);
 
-        // This condition controls the animation and also DirtSPlatter of the player while moving.
-        if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.S))
-        {
-            playerAnimator.SetBool("Static_b", false);
-            playerAnimator.SetFloat("Speed_f", movingSpeed);
+        //    transform.Translate(moveNew.x, moveNew.y,moveNew.z-1);
+        //    playerRB.AddForce(0, jumpSpeed, 0 * Time.deltaTime, ForceMode.Impulse);
+        //    //playerRB.AddForce(transform.forward * Time.deltaTime * 3000, ForceMode.Acceleration);
+        //}
 
-            playerDirtSplatterParticlFX.Play(); // Dirst Splatter Play
+       
+            // This condition controls the movement of the player while moving.
+            if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W))
+            {
+                if (playerRB.velocity.magnitude < velocityLimit)
+                    playerRB.AddForce(transform.forward * Time.deltaTime * movingSpeed, ForceMode.Force);
 
-        }
-        else if (Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.DownArrow) || Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.S))
-        {
-            playerAnimator.SetBool("Static_b", true);
-            playerAnimator.SetFloat("Speed_f", 0);
+            }
+            else if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S))
+            {
+                playerRB.AddForce(-transform.forward * Time.deltaTime * movingSpeed, ForceMode.Force);
+            }
+            // This condition controls the Jump of the player while moving.
+            if (Input.GetKey(KeyCode.Space) && isPlayerOnGround)
+            {
+                isPlayerOnGround = false;
+                playerRB.AddForce(transform.up * Time.deltaTime * jumpSpeed, ForceMode.Impulse);
+            }
 
-            playerDirtSplatterParticlFX.Stop(); // Dirst Splatter Stop
-        }
+            // This condition controls the animation and also DirtSPlatter of the player while moving.
+            if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.S))
+            {
+                playerAnimator.SetBool("Static_b", false);
+                playerAnimator.SetFloat("Speed_f", movingSpeed);
 
+                playerDirtSplatterParticlFX.Play(); // Dirst Splatter Play
+
+            }
+            else if (Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.DownArrow) || Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.S))
+            {
+                playerAnimator.SetBool("Static_b", true);
+                playerAnimator.SetFloat("Speed_f", 0);
+
+                playerDirtSplatterParticlFX.Stop(); // Dirst Splatter Stop
+            }
+        
+
+      
 
     }
 
@@ -158,12 +215,21 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+
+        Debug.Log("Game Object Name is - " + other.gameObject.name);
         if (other.tag.StartsWith("Powerup"))
         {
             Destroy(other.gameObject);
             spawnManager.hasOnePowerupInScene = false; //Letting know SpawnManager that there is no powerup in the scene.
         }
+
+        if (other.gameObject.name.Contains("Snow"))
+        {
+            Debug.Log("Is On Ground");
+            isPlayerOnGround = true;
+        }
     }
+    
 }
 
 // How to make the player stand on the ground/Snow and make physics work
@@ -171,3 +237,5 @@ public class PlayerController : MonoBehaviour
 // transform.Rotate(Vector3.up,horizontalMovement * turningSpeed * Time.deltaTime); -- Not working
 // Why do we need Input.GetAxis when we can use Input.getKeyDown(up arrow)
 // Why/when do we use Public variable and drag + drop ; why do we use GetComponent<Type>();
+
+//Change BGM if needed and increase the volume back
