@@ -110,7 +110,7 @@ public class PlayerController : MonoBehaviour
                 playerRB.AddForce(-transform.forward * Time.deltaTime * movingSpeed, ForceMode.Force);
             }
             // This condition controls the Jump of the player while moving.
-            if (Input.GetKey(KeyCode.Space) && isPlayerOnGround)
+            if (Input.GetKeyUp(KeyCode.Space) && isPlayerOnGround)
             {
                 isPlayerOnGround = false;
                 playerRB.AddForce(transform.up * Time.deltaTime * jumpSpeed, ForceMode.Impulse);
