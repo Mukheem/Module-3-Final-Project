@@ -20,28 +20,30 @@ public class PlayerController : MonoBehaviour
     private Animator playerAnimator;
     public ParticleSystem playerExplosionParticleFX;
     public ParticleSystem playerDirtSplatterParticlFX;
+    public ParticleSystem playerPowerupFX;
     private AudioSource gameBGM;
     public AudioClip playerDeathSound;
     private AudioSource playerAudioSource;
     private SpawnManager spawnManager;
     private Rigidbody playerRB;
-    public float velocityLimit = 1.0f;
+    
 
 
     // Misellaneous
     public float gravityModifier;
     public ProgressBarCircle playerHealth;
-    private int playerHealthCountdownTimeLimit = 1; //Every 8 seconds, Player looses his/her health.
+    private int playerHealthCountdownTimeLimit = 8; //Every 8 seconds, Player looses his/her health.
     public bool isGameOver;
     public bool isPlayerOnGround;
-   
+    public float velocityLimit = 2.0f; // TO control player speed when he is in the air.
+
 
 
     // Start is called before the first frame update
     void Start()
     {
         //Player Start Position 
-        //transform.position = new Vector3(98.0f, 24f, -65f);
+       //s transform.position = new Vector3(98.0f, 24f, -65f);
         playerAnimator = GetComponent<Animator>();
         spawnManager = GameObject.Find("Spawn Manager").GetComponent<SpawnManager>();
         Physics.gravity *= gravityModifier;
@@ -55,27 +57,17 @@ public class PlayerController : MonoBehaviour
         gameBGM = GameObject.Find("Main Camera").GetComponent<AudioSource>();
         playerAudioSource = GetComponent<AudioSource>();
 
-    }
-
-
-    private void FixedUpdate()
-    {
-        //if (Input.GetKeyUp(KeyCode.Space) && isPlayerOnGround && (Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.W)) )
-        //{
-        //    // Move the object forward along its z axis 1 unit/second.
-        //    transform.Translate(Vector3.forward * Time.deltaTime);
-
-        //    // Move the object upward in world space 1 unit/second.
-        //    transform.Translate(Vector3.up * Time.deltaTime * 10, Space.World);
-           
-
-
-        //}
+        //Disabling the powerup ParticleFX
+        playerPowerupFX.transform.parent.gameObject.SetActive(false);
 
     }
+
+
+    
     // Update is called once per frame
     void Update()
     {
+        
         // Movement of the player
         horizontalMovement = Input.GetAxis("Horizontal");
         forwardMovement = Input.GetAxis("Vertical");
@@ -101,14 +93,18 @@ public class PlayerController : MonoBehaviour
             // This condition controls the movement of the player while moving.
             if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W))
             {
-                if (playerRB.velocity.magnitude < velocityLimit)
+                // This condition is to slowdown the speed of the palyer when he is in the air
+                if (playerRB.velocity.magnitude < velocityLimit && !isPlayerOnGround)
+                    playerRB.AddForce(transform.forward * Time.deltaTime * movingSpeed, ForceMode.Force);
+                else
                     playerRB.AddForce(transform.forward * Time.deltaTime * movingSpeed, ForceMode.Force);
 
-            }
+        }
             else if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S))
             {
                 playerRB.AddForce(-transform.forward * Time.deltaTime * movingSpeed, ForceMode.Force);
             }
+
             // This condition controls the Jump of the player while moving.
             if (Input.GetKeyUp(KeyCode.Space) && isPlayerOnGround)
             {
@@ -219,8 +215,12 @@ public class PlayerController : MonoBehaviour
         Debug.Log("Game Object Name is - " + other.gameObject.name);
         if (other.tag.StartsWith("Powerup"))
         {
+            //Enabling the powerup ParticleFX
+            playerPowerupFX.transform.parent.gameObject.SetActive(true);
             Destroy(other.gameObject);
             spawnManager.hasOnePowerupInScene = false; //Letting know SpawnManager that there is no powerup in the scene.
+            playerPowerupFX.Play();
+        
         }
 
         if (other.gameObject.name.Contains("Snow"))

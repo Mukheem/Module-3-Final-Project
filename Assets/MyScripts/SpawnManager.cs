@@ -49,6 +49,7 @@ public class SpawnManager : MonoBehaviour
         } while (powerupIndices.Contains(powerupIndex) && (powerupIndices.Count < powerups.Length));
         powerupIndices.Add(powerupIndex);
         Debug.Log("PowerupIndex chosen is: "+powerupIndex);
+
         switch (powerupIndex)
         {
             case 0:
