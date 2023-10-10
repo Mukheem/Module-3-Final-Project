@@ -56,20 +56,21 @@ public class SpawnManager : MonoBehaviour
                 instantiatePowerupOne();
                 break;
             case 1:
+                instantiatePowerupTwo();
                 break;
 
             case 2:
+                instantiatePowerupThree();
                 break;
             case 3:
+                instantiatePowerupFour();
                 break;
             case 4:
+                instantiatePowerupFive();
                 break;
-            case 5:
-                break;
-            case 6:
-                break;
+            
             default:
-                print("Incorrect intelligence level.");
+                Debug.Log("Default Case");
                 break;
         }
 
@@ -79,12 +80,12 @@ public class SpawnManager : MonoBehaviour
 
     private void instantiatePowerupOne()
     {
-        float xAxisRangeStart = 87.0f;
-        float xAxisRangeEnd = 103.0f;
-        float zAxisRangeStart = -116.0f;
-        float zAxisRangeEnd = -92.0f;
-        float yAxisRangeStart = 24;
-        float yAxisRangeEnd = 25;
+        float xAxisRangeStart = 105.0f;
+        float xAxisRangeEnd = 121.0f;
+        float zAxisRangeStart = -141.0f;
+        float zAxisRangeEnd = -88.0f;
+        float yAxisRangeStart = 34;
+        float yAxisRangeEnd = 35;
 
         bool aptPositionFound = false;
 
@@ -104,5 +105,46 @@ public class SpawnManager : MonoBehaviour
             }
         }
 
+    }
+
+    private void instantiatePowerupTwo()
+    {
+        Vector3[] powerupTwoLocations = { new Vector3(98.43f,25.524f,-149.826f), new Vector3(83.15f, 17.08f, -137.57f),new Vector3(57.65f, 13.98f, -133.24f) };
+
+        Vector3 powerupTwoPos = powerupTwoLocations[Random.Range(0, powerupTwoLocations.Length)];
+
+        Instantiate(powerups[1], powerupTwoPos, transform.rotation);
+    
+        hasOnePowerupInScene = true; // Bool condition to stop and start spawnning powerups
+    }
+    private void instantiatePowerupThree()
+    {
+        Vector3[] powerupThreeLocations = { new Vector3(30.8f,15.86f-131.63f), new Vector3(8.01f,11.37f,-109.38f), new Vector3(68.78f,13.15f,-83.79f) };
+
+        Vector3 powerupThreePos = powerupThreeLocations[Random.Range(0, powerupThreeLocations.Length)];
+
+        Instantiate(powerups[2], powerupThreePos, transform.rotation);
+
+        hasOnePowerupInScene = true; // Bool condition to stop and start spawnning powerups
+    }
+    private void instantiatePowerupFour()
+    {
+        Vector3[] powerupFourLocations = { new Vector3(23.564f,10.91f,-99.64f), new Vector3(41.86f,10.1f,-86.77f), new Vector3(28.07f,12.48f,-115.37f) };
+
+        Vector3 powerupFourPos = powerupFourLocations[Random.Range(0, powerupFourLocations.Length)];
+
+        Instantiate(powerups[3], powerupFourPos, transform.rotation);
+
+        hasOnePowerupInScene = true; // Bool condition to stop and start spawnning powerups
+    }
+    private void instantiatePowerupFive()
+    {
+        Vector3[] powerupFiveLocations = { new Vector3(102f,25.41f,-75.73f), new Vector3(77.4f,10.312f,-69.698f), new Vector3(39.77f,18.52f,-122.39f) };
+
+        Vector3 powerupFivePos = powerupFiveLocations[Random.Range(0, powerupFiveLocations.Length)];
+
+        Instantiate(powerups[4], powerupFivePos, transform.rotation);
+
+        hasOnePowerupInScene = true; // Bool condition to stop and start spawnning powerups
     }
 }

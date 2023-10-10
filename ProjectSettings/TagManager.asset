@@ -11,6 +11,7 @@ TagManager:
   - Powerup-Cookie
   - Powerup-Milk
   - Powerup-WaterMelon
+  - Poison
   layers:
   - Default
   - TransparentFX

@@ -23,6 +23,7 @@ public class PlayerController : MonoBehaviour
     public ParticleSystem playerPowerupFX;
     private AudioSource gameBGM;
     public AudioClip playerDeathSound;
+    public AudioClip playerPowerupCollectionSound;
     private AudioSource playerAudioSource;
     private SpawnManager spawnManager;
     private Rigidbody playerRB;
@@ -36,7 +37,11 @@ public class PlayerController : MonoBehaviour
     public bool isGameOver;
     public bool isPlayerOnGround;
     public float velocityLimit = 2.0f; // TO control player speed when he is in the air.
-
+    private int appleHealth = 15;
+    private int milkHealth = 25;
+    private int cookieHealth = 10;
+    private int bigbottleHealth = 30;
+    private int moneyHealth = 25;
 
 
     // Start is called before the first frame update
@@ -75,7 +80,8 @@ public class PlayerController : MonoBehaviour
         // This condition controls the rotation of the player while moving.
         transform.Rotate(Vector3.up, horizontalMovement * turningSpeed);
 
-
+        //Making sure that Indicator is always showing right color
+        healthColurIndicator();
 
         //if (Input.GetKey(KeyCode.Space) && isPlayerOnGround && (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W)))
         //{
@@ -89,13 +95,16 @@ public class PlayerController : MonoBehaviour
         //    //playerRB.AddForce(transform.forward * Time.deltaTime * 3000, ForceMode.Acceleration);
         //}
 
-       
-            // This condition controls the movement of the player while moving.
-            if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W))
+
+        // This condition controls the movement of the player while moving.
+        if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W))
             {
                 // This condition is to slowdown the speed of the palyer when he is in the air
                 if (playerRB.velocity.magnitude < velocityLimit && !isPlayerOnGround)
+                {
                     playerRB.AddForce(transform.forward * Time.deltaTime * movingSpeed, ForceMode.Force);
+                    playerRB.AddForce(Vector3.down * Time.deltaTime * movingSpeed, ForceMode.Force);
+                }
                 else
                     playerRB.AddForce(transform.forward * Time.deltaTime * movingSpeed, ForceMode.Force);
 
@@ -204,7 +213,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            playerHealth.BarBackGroundColor = Color.grey;
+            playerHealth.BarBackGroundColor = Color.blue;
         }
     }
 
@@ -217,10 +226,39 @@ public class PlayerController : MonoBehaviour
         {
             //Enabling the powerup ParticleFX
             playerPowerupFX.transform.parent.gameObject.SetActive(true);
-            Destroy(other.gameObject);
+            
             spawnManager.hasOnePowerupInScene = false; //Letting know SpawnManager that there is no powerup in the scene.
+            // Playing Player Powerup Collection Visual FX - Visual
             playerPowerupFX.Play();
-        
+            // Playing Player Powerup Collection Sound FX - Audio
+            playerAudioSource.PlayOneShot(playerPowerupCollectionSound, 1.0f);
+
+            if (other.gameObject.name.Contains("Apple"))
+            {
+                playerHealth.BarValue += appleHealth;
+                Destroy(other.gameObject);
+            }
+            else if (other.gameObject.name.Contains("Milk"))
+            {
+                playerHealth.BarValue += milkHealth;
+                Destroy(other.gameObject);
+            }
+            else if (other.gameObject.name.Contains("Cookie"))
+            {
+                playerHealth.BarValue += cookieHealth;
+                Destroy(other.gameObject);
+            }
+            else if (other.gameObject.name.Contains("BigBottle"))
+            {
+                playerHealth.BarValue += bigbottleHealth;
+                Destroy(other.gameObject);
+            }
+            else if (other.gameObject.name.Contains("10000dol"))
+            {
+                playerHealth.BarValue += moneyHealth;
+                Destroy(other.gameObject);
+            }
+
         }
 
         if (other.gameObject.name.Contains("Snow"))
@@ -229,8 +267,20 @@ public class PlayerController : MonoBehaviour
             isPlayerOnGround = true;
         }
     }
-    
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.CompareTag("Poison") && playerHealth.BarValue > 20)
+        {
+            playerHealth.BarValue -= 1;
+        }
+    }
+
 }
+
+//particle fx when taking powerups
+
+
 
 // How to make the player stand on the ground/Snow and make physics work
 // Player Movement with Physics is not working
