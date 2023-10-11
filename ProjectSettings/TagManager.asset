@@ -12,6 +12,7 @@ TagManager:
   - Powerup-Milk
   - Powerup-WaterMelon
   - Poison
+  - DyingZone
   layers:
   - Default
   - TransparentFX

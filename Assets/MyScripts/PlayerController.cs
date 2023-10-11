@@ -12,8 +12,9 @@ public class PlayerController : MonoBehaviour
     private float horizontalMovement;
     private float forwardMovement;
     public float movingSpeed = 2000;
-    public float turningSpeed = 0.5f;
-    public float jumpSpeed = 50;
+    public float turningSpeed = 0.6f;
+    public float jumpSpeed = 255000;
+    private float jumpRestTimer = 3.5f;
     
 
     // Component Variables
@@ -35,7 +36,7 @@ public class PlayerController : MonoBehaviour
     public ProgressBarCircle playerHealth;
     private int playerHealthCountdownTimeLimit = 8; //Every 8 seconds, Player looses his/her health.
     public bool isGameOver;
-    public bool isPlayerOnGround;
+    public bool canPlayerJump;
     public float velocityLimit = 2.0f; // TO control player speed when he is in the air.
     private int appleHealth = 15;
     private int milkHealth = 25;
@@ -58,6 +59,7 @@ public class PlayerController : MonoBehaviour
         StartCoroutine("PlayerHealthCounter");
 
         isGameOver = false;
+        canPlayerJump = true;
 
         gameBGM = GameObject.Find("Main Camera").GetComponent<AudioSource>();
         playerAudioSource = GetComponent<AudioSource>();
@@ -83,11 +85,11 @@ public class PlayerController : MonoBehaviour
         //Making sure that Indicator is always showing right color
         healthColurIndicator();
 
-        //if (Input.GetKey(KeyCode.Space) && isPlayerOnGround && (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W)))
+        //if (Input.GetKey(KeyCode.Space) && canPlayerJump && (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W)))
         //{
         //    Vector3 moveNew = new Vector3(transform.position.x,transform.position.y,transform.position.z);
         //    Debug.Log("Inside Combination");
-        //    isPlayerOnGround = false;
+        //    canPlayerJump = false;
         //    playerRB.AddForce(transform.up * Time.deltaTime * jumpSpeed, ForceMode.Impulse);
 
         //    transform.Translate(moveNew.x, moveNew.y,moveNew.z-1);
@@ -100,7 +102,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W))
             {
                 // This condition is to slowdown the speed of the palyer when he is in the air
-                if (playerRB.velocity.magnitude < velocityLimit && !isPlayerOnGround)
+                if (playerRB.velocity.magnitude < velocityLimit && !canPlayerJump)
                 {
                     playerRB.AddForce(transform.forward * Time.deltaTime * movingSpeed, ForceMode.Force);
                     playerRB.AddForce(Vector3.down * Time.deltaTime * movingSpeed, ForceMode.Force);
@@ -115,9 +117,10 @@ public class PlayerController : MonoBehaviour
             }
 
             // This condition controls the Jump of the player while moving.
-            if (Input.GetKeyUp(KeyCode.Space) && isPlayerOnGround)
+            if (Input.GetKey(KeyCode.Space) && canPlayerJump)
             {
-                isPlayerOnGround = false;
+                canPlayerJump = false;
+                StartCoroutine(jumpCounter());
                 playerRB.AddForce(transform.up * Time.deltaTime * jumpSpeed, ForceMode.Impulse);
             }
 
@@ -170,7 +173,7 @@ public class PlayerController : MonoBehaviour
         isGameOver = true;
         // Play death Aimation
         playerAnimator.SetBool("Death_b", true);
-        playerAnimator.SetInteger("DeathType_int", 1);
+        playerAnimator.SetInteger("DeathType_int", 2);
         // Turning off the low-health indicating sound.
         playerHealth.repeat = false;
         playerHealth.sound = null;
@@ -261,10 +264,10 @@ public class PlayerController : MonoBehaviour
 
         }
 
-        if (other.gameObject.name.Contains("Snow"))
+        if (other.CompareTag("DyingZone"))
         {
-            Debug.Log("Is On Ground");
-            isPlayerOnGround = true;
+            Debug.Log("Player died of falling off island");
+            PlayerDeath();
         }
     }
 
@@ -274,6 +277,13 @@ public class PlayerController : MonoBehaviour
         {
             playerHealth.BarValue -= 1;
         }
+    }
+
+    private IEnumerator jumpCounter()
+    {
+        
+        yield return new WaitForSeconds(jumpRestTimer);
+        canPlayerJump = true;
     }
 
 }

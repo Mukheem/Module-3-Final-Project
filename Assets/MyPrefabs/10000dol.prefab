@@ -109,6 +109,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: PoisonGas
       objectReference: {fileID: 0}
+    - target: {fileID: 1547757601392324, guid: 62db484ba65e8423aae89f5a44ff4d2e, type: 3}
+      propertyPath: m_TagString
+      value: Poison
+      objectReference: {fileID: 0}
     - target: {fileID: 4859880167833556, guid: 62db484ba65e8423aae89f5a44ff4d2e, type: 3}
       propertyPath: m_RootOrder
       value: 0
