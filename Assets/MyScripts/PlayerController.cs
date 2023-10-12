@@ -323,10 +323,7 @@ public class PlayerController : MonoBehaviour
         canPlayerJump = true;
     }
 
-    public void RestartGame()
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-    }
+    
 
     private void IncrementObjectCollectionScoreAndShow()
     {
@@ -346,16 +343,21 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    public void StartGame()
+    {
+        SceneManager.LoadScene(1);
+    }
+
+
 }
 
 
 
 
 
-// How to make the player stand on the ground/Snow and make physics work
-// Player Movement with Physics is not working
-// transform.Rotate(Vector3.up,horizontalMovement * turningSpeed * Time.deltaTime); -- Not working
-// Why do we need Input.GetAxis when we can use Input.getKeyDown(up arrow)
-// Why/when do we use Public variable and drag + drop ; why do we use GetComponent<Type>();
-
-//Change BGM if needed and increase the volume back
+// Floating Text doesnot update on the fly and the object is not deactivated upon playeräs death
