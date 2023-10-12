@@ -42813,9 +42813,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c019abf03a4f14fa3aca92ca1c35eb61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movingSpeed: 60000
-  turningSpeed: 0.6
-  jumpSpeed: 90000
+  movingSpeed: 40000
+  turningSpeed: 0.4
+  jumpSpeed: 40000
   playerExplosionParticleFX: {fileID: 1260913569}
   playerDirtSplatterParticlFX: {fileID: 2378184072763280172}
   playerPowerupFX: {fileID: 1663861244}

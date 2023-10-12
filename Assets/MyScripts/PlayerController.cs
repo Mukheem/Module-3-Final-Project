@@ -11,9 +11,9 @@ public class PlayerController : MonoBehaviour
     //Movement Variables
     private float horizontalMovement;
     private float forwardMovement;
-    public float movingSpeed = 60000;
-    public float turningSpeed = 0.6f;
-    public float jumpSpeed = 90000;
+    public float movingSpeed = 40000;
+    public float turningSpeed = 0.4f;
+    public float jumpSpeed = 40000;
     private float jumpRestTimer = 3.5f;
     
 
@@ -184,7 +184,7 @@ public class PlayerController : MonoBehaviour
        
         if (isSuccessfulDeath)
         {
-            Destroy(this.gameObject);
+            Destroy(this.gameObject,1.25f);
         }
         else
         {
@@ -338,6 +338,12 @@ public class PlayerController : MonoBehaviour
 
         floatingTextPrefab.GetComponentInChildren<TextMesh>().text = (objectsCollected).ToString() + "/5";
         //Destroy(floatingTextPrefab, 1);
+
+        if(objectsCollected == 5)
+        {
+            //Updating ClueText to - reach Safe house
+            clueText.text = "Bravo...Now,Reach SafeHouse before health runs out.";
+        }
     }
 
 }
