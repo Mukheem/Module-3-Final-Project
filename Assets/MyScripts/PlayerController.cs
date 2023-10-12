@@ -11,9 +11,9 @@ public class PlayerController : MonoBehaviour
     //Movement Variables
     private float horizontalMovement;
     private float forwardMovement;
-    public float movingSpeed = 2000;
+    public float movingSpeed = 60000;
     public float turningSpeed = 0.6f;
-    public float jumpSpeed = 255000;
+    public float jumpSpeed = 90000;
     private float jumpRestTimer = 3.5f;
     
 
@@ -28,7 +28,9 @@ public class PlayerController : MonoBehaviour
     private AudioSource playerAudioSource;
     private SpawnManager spawnManager;
     private Rigidbody playerRB;
-    
+    [SerializeField]
+    private GameObject floatingTextPrefab;
+
 
 
     // Misellaneous
@@ -43,13 +45,16 @@ public class PlayerController : MonoBehaviour
     private int cookieHealth = 10;
     private int bigbottleHealth = 30;
     private int moneyHealth = 25;
+    public int objectsCollected = 0;
+    
 
 
     // Start is called before the first frame update
     void Start()
     {
+        
         //Player Start Position 
-       //s transform.position = new Vector3(98.0f, 24f, -65f);
+        //s transform.position = new Vector3(98.0f, 24f, -65f);
         playerAnimator = GetComponent<Animator>();
         spawnManager = GameObject.Find("Spawn Manager").GetComponent<SpawnManager>();
         Physics.gravity *= gravityModifier;
@@ -83,20 +88,14 @@ public class PlayerController : MonoBehaviour
         transform.Rotate(Vector3.up, horizontalMovement * turningSpeed);
 
         //Making sure that Indicator is always showing right color
-        healthColurIndicator();
+        HealthColurIndicator();
 
-        //if (Input.GetKey(KeyCode.Space) && canPlayerJump && (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W)))
-        //{
-        //    Vector3 moveNew = new Vector3(transform.position.x,transform.position.y,transform.position.z);
-        //    Debug.Log("Inside Combination");
-        //    canPlayerJump = false;
-        //    playerRB.AddForce(transform.up * Time.deltaTime * jumpSpeed, ForceMode.Impulse);
 
-        //    transform.Translate(moveNew.x, moveNew.y,moveNew.z-1);
-        //    playerRB.AddForce(0, jumpSpeed, 0 * Time.deltaTime, ForceMode.Impulse);
-        //    //playerRB.AddForce(transform.forward * Time.deltaTime * 3000, ForceMode.Acceleration);
-        //}
-
+        //Restart Game
+        if (Input.GetKey(KeyCode.R))
+        {
+            RestartGame();
+        }
 
         // This condition controls the movement of the player while moving.
         if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W))
@@ -120,7 +119,7 @@ public class PlayerController : MonoBehaviour
             if (Input.GetKey(KeyCode.Space) && canPlayerJump)
             {
                 canPlayerJump = false;
-                StartCoroutine(jumpCounter());
+                StartCoroutine(JumpCounter());
                 playerRB.AddForce(transform.up * Time.deltaTime * jumpSpeed, ForceMode.Impulse);
             }
 
@@ -154,12 +153,12 @@ public class PlayerController : MonoBehaviour
 
             yield return new WaitForSeconds(playerHealthCountdownTimeLimit);
             playerHealth.BarValue -= 1;
-            healthColurIndicator();
+            HealthColurIndicator();
 
             //If Player's health is Zero then he dies 
             if (playerHealth.BarValue == 0)
             {
-                PlayerDeath();
+                PlayerDeath(false);
             }
 
         }
@@ -167,30 +166,38 @@ public class PlayerController : MonoBehaviour
     }
 
     // Player's death and other rituals are handled.
-    private void PlayerDeath()
+    private void PlayerDeath(bool IsSuccessfulDeath)
     {
-        // GameOver - Set to true
-        isGameOver = true;
-        // Play death Aimation
-        playerAnimator.SetBool("Death_b", true);
-        playerAnimator.SetInteger("DeathType_int", 2);
-        // Turning off the low-health indicating sound.
-        playerHealth.repeat = false;
-        playerHealth.sound = null;
-        // Stop BGM
-        gameBGM.Stop();
-        // Playing Player Death Explosion FX - Visual
-        playerExplosionParticleFX.Play(); 
-        // Playing Player Death Sound FX - Audio
-        playerAudioSource.PlayOneShot(playerDeathSound,1.0f);
-        
+        if (IsSuccessfulDeath)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            // GameOver - Set to true
+            isGameOver = true;
+            // Play death Aimation
+            playerAnimator.SetBool("Death_b", true);
+            playerAnimator.SetInteger("DeathType_int", 2);
+            // Turning off the low-health indicating sound.
+            playerHealth.repeat = false;
+            playerHealth.sound = null;
+            // Stop BGM
+            gameBGM.Stop();
+            // Playing Player Death Explosion FX - Visual
+            playerExplosionParticleFX.Play();
+            // Playing Player Death Sound FX - Audio
+            playerAudioSource.PlayOneShot(playerDeathSound, 1.0f);
 
-        //Destroy Player
-        //Destroy(this.gameObject, 2.20f);
+
+            //Destroy Player
+            //Destroy(this.gameObject, 2.20f);
+        }
+
     }
 
     // Health Bar color codes and conditions
-    private void healthColurIndicator()
+    private void HealthColurIndicator()
     {
         
         if (playerHealth.BarValue > 75 && playerHealth.BarValue < 91)
@@ -235,6 +242,8 @@ public class PlayerController : MonoBehaviour
             playerPowerupFX.Play();
             // Playing Player Powerup Collection Sound FX - Audio
             playerAudioSource.PlayOneShot(playerPowerupCollectionSound, 1.0f);
+            //Add powerup to Object collection and show score
+            IncrementObjectCollectionScoreAndShow();
 
             if (other.gameObject.name.Contains("Apple"))
             {
@@ -267,7 +276,11 @@ public class PlayerController : MonoBehaviour
         if (other.CompareTag("DyingZone"))
         {
             Debug.Log("Player died of falling off island");
-            PlayerDeath();
+            PlayerDeath(false);
+        }
+        if (other.CompareTag("SafeHouse") && objectsCollected ==5)
+        {
+            PlayerDeath(true);
         }
     }
 
@@ -279,11 +292,28 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private IEnumerator jumpCounter()
+    private IEnumerator JumpCounter()
     {
         
         yield return new WaitForSeconds(jumpRestTimer);
         canPlayerJump = true;
+    }
+
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    private void IncrementObjectCollectionScoreAndShow()
+    {
+        Debug.Log("Objects collected before -" + objectsCollected);
+        objectsCollected =objectsCollected+1;
+        Debug.Log("Objects collected after -" + objectsCollected);
+        //GameObject parentFloatingText = Instantiate(floatingTextPrefab, new Vector3(transform.position.x, transform.position.y + 3, transform.position.z), Quaternion.identity);
+        //parentFloatingText.GetComponentInChildren<TextMesh>().text = (objectsCollected).ToString()+"/5";
+
+        floatingTextPrefab.GetComponentInChildren<TextMesh>().text = (objectsCollected).ToString() + "/5";
+        //Destroy(floatingTextPrefab, 1);
     }
 
 }
