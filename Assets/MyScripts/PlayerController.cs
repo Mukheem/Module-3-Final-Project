@@ -45,7 +45,9 @@ public class PlayerController : MonoBehaviour
     private int cookieHealth = 10;
     private int bigbottleHealth = 30;
     private int moneyHealth = 25;
-    public int objectsCollected = 0;
+    public int objectsCollected;
+    public TextMeshProUGUI clueText;
+    public TextMeshProUGUI gameOverText;
     
 
 
@@ -65,6 +67,10 @@ public class PlayerController : MonoBehaviour
 
         isGameOver = false;
         canPlayerJump = true;
+
+        //GUI Text related initializations
+        objectsCollected = 0;
+        clueText.text = "Go, get all the objects before health runs out.";
 
         gameBGM = GameObject.Find("Main Camera").GetComponent<AudioSource>();
         playerAudioSource = GetComponent<AudioSource>();
@@ -165,17 +171,24 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    // Player's death and other rituals are handled.
-    private void PlayerDeath(bool IsSuccessfulDeath)
+
+    /* Player's death and other rituals are handled.
+     * This method takes a parameter which decides if player has reached goal or died abruptly.
+     * 
+     * IsSuccessfulDeath - True when palyer reaches goal; false if he dies abrubptly.
+     */
+    private void PlayerDeath(bool isSuccessfulDeath)
     {
-        if (IsSuccessfulDeath)
+        // GameOver - Set to true irrespective of isSuccessfulDeath
+        isGameOver = true;
+       
+        if (isSuccessfulDeath)
         {
             Destroy(this.gameObject);
         }
         else
         {
-            // GameOver - Set to true
-            isGameOver = true;
+            
             // Play death Aimation
             playerAnimator.SetBool("Death_b", true);
             playerAnimator.SetInteger("DeathType_int", 2);
@@ -188,11 +201,15 @@ public class PlayerController : MonoBehaviour
             playerExplosionParticleFX.Play();
             // Playing Player Death Sound FX - Audio
             playerAudioSource.PlayOneShot(playerDeathSound, 1.0f);
+            //Make player's health to Zero as soon as he dies
+            playerHealth.BarValue = 0;
 
-
-            //Destroy Player
-            //Destroy(this.gameObject, 2.20f);
         }
+        //Deactivate Floating Text on Player's head upon palyer's death
+        floatingTextPrefab.SetActive(false);
+        // GameOver - text displayed irrespective of isSuccessfulDeath and after all the animations/sounds are played.
+        gameOverText.gameObject.SetActive(true);
+        
 
     }
 
@@ -245,8 +262,11 @@ public class PlayerController : MonoBehaviour
             //Add powerup to Object collection and show score
             IncrementObjectCollectionScoreAndShow();
 
+            //Updating ClueText
+            clueText.text = "Object " + gameObject.name + " collected...";
+
             if (other.gameObject.name.Contains("Apple"))
-            {
+            {                
                 playerHealth.BarValue += appleHealth;
                 Destroy(other.gameObject);
             }
@@ -275,11 +295,15 @@ public class PlayerController : MonoBehaviour
 
         if (other.CompareTag("DyingZone"))
         {
-            Debug.Log("Player died of falling off island");
+            //Updating ClueText
+            clueText.text = "You died falling off island";
+            Debug.Log("Player died falling off island");
             PlayerDeath(false);
         }
         if (other.CompareTag("SafeHouse") && objectsCollected ==5)
         {
+            //Updating ClueText
+            clueText.text = "Goal achieved";
             PlayerDeath(true);
         }
     }

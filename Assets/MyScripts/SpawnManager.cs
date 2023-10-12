@@ -2,12 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using TMPro;
 
 public class SpawnManager : MonoBehaviour
 {
     public GameObject[] powerups;
     public bool hasOnePowerupInScene = false;
     private List<int> powerupIndices = new List<int>();
+    public TextMeshProUGUI clueText;
 
     // Start is called before the first frame update
     void Start()
@@ -70,7 +72,7 @@ public class SpawnManager : MonoBehaviour
                 break;
             
             default:
-                Debug.Log("Default Case");
+                Debug.Log("Default Powerup - Not needed as powerups are predefined.");
                 break;
         }
 
@@ -99,7 +101,9 @@ public class SpawnManager : MonoBehaviour
             }
             else
             {
-                Instantiate(powerups[0], powerupOnePos, transform.rotation);
+                GameObject spawnnedPowerup = Instantiate(powerups[0], powerupOnePos, transform.rotation);
+                //Updating ClueText
+                clueText.text = spawnnedPowerup.tag + " is out there for you to collect";
                 aptPositionFound = true; // Bool condition to break the loop
                 hasOnePowerupInScene = true; // Bool condition to stop and start spawnning powerups
             }
@@ -113,8 +117,10 @@ public class SpawnManager : MonoBehaviour
 
         Vector3 powerupTwoPos = powerupTwoLocations[Random.Range(0, powerupTwoLocations.Length)];
 
-        Instantiate(powerups[1], powerupTwoPos, transform.rotation);
-    
+        GameObject spawnnedPowerup = Instantiate(powerups[1], powerupTwoPos, transform.rotation);
+        //Updating ClueText
+        clueText.text = spawnnedPowerup.tag + " is out there for you to collect";
+
         hasOnePowerupInScene = true; // Bool condition to stop and start spawnning powerups
     }
     private void instantiatePowerupThree()
@@ -123,7 +129,9 @@ public class SpawnManager : MonoBehaviour
 
         Vector3 powerupThreePos = powerupThreeLocations[Random.Range(0, powerupThreeLocations.Length)];
 
-        Instantiate(powerups[2], powerupThreePos, transform.rotation);
+        GameObject spawnnedPowerup = Instantiate(powerups[2], powerupThreePos, transform.rotation);
+        //Updating ClueText
+        clueText.text = spawnnedPowerup.tag + " is out there for you to collect";
 
         hasOnePowerupInScene = true; // Bool condition to stop and start spawnning powerups
     }
@@ -133,7 +141,9 @@ public class SpawnManager : MonoBehaviour
 
         Vector3 powerupFourPos = powerupFourLocations[Random.Range(0, powerupFourLocations.Length)];
 
-        Instantiate(powerups[3], powerupFourPos, transform.rotation);
+        GameObject spawnnedPowerup = Instantiate(powerups[3], powerupFourPos, transform.rotation);
+        //Updating ClueText
+        clueText.text = spawnnedPowerup.tag + " is out there for you to collect";
 
         hasOnePowerupInScene = true; // Bool condition to stop and start spawnning powerups
     }
@@ -143,7 +153,9 @@ public class SpawnManager : MonoBehaviour
 
         Vector3 powerupFivePos = powerupFiveLocations[Random.Range(0, powerupFiveLocations.Length)];
 
-        Instantiate(powerups[4], powerupFivePos, transform.rotation);
+        GameObject spawnnedPowerup = Instantiate(powerups[4], powerupFivePos, transform.rotation);
+        //Updating ClueText
+        clueText.text = spawnnedPowerup.tag + " is out there for you to collect";
 
         hasOnePowerupInScene = true; // Bool condition to stop and start spawnning powerups
     }
