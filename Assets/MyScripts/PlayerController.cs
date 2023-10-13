@@ -47,6 +47,7 @@ public class PlayerController : MonoBehaviour
     public int objectsCollected;
     public TextMeshProUGUI clueText;
     public TextMeshProUGUI gameOverText;
+    public TextMeshProUGUI jumpIndicator;
     public Button restartGameButton;
     [SerializeField]
     private TextMeshProUGUI floatingText;
@@ -69,6 +70,7 @@ public class PlayerController : MonoBehaviour
 
         isGameOver = false;
         canPlayerJump = true;
+        jumpIndicator.gameObject.SetActive(true);
 
         //GUI Text related initializations
         objectsCollected = 0;
@@ -127,6 +129,7 @@ public class PlayerController : MonoBehaviour
             if (Input.GetKey(KeyCode.Space) && canPlayerJump)
             {
                 canPlayerJump = false;
+                jumpIndicator.gameObject.SetActive(false);
                 StartCoroutine(JumpCounter());
                 playerRB.AddForce(transform.up * Time.deltaTime * jumpSpeed, ForceMode.Impulse);
             }
@@ -325,6 +328,7 @@ public class PlayerController : MonoBehaviour
         
         yield return new WaitForSeconds(jumpRestTimer);
         canPlayerJump = true;
+        jumpIndicator.gameObject.SetActive(true);
     }
 
     
