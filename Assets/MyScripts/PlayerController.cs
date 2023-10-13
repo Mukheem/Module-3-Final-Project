@@ -12,8 +12,8 @@ public class PlayerController : MonoBehaviour
     private float horizontalMovement;
     private float forwardMovement;
     public float movingSpeed = 40000;
-    public float turningSpeed = 0.4f;
-    public float jumpSpeed = 40000;
+    public float turningSpeed = 0.27f;
+    public float jumpSpeed = 90000;
     private float jumpRestTimer = 3.5f;
     
 
@@ -28,8 +28,7 @@ public class PlayerController : MonoBehaviour
     private AudioSource playerAudioSource;
     private SpawnManager spawnManager;
     private Rigidbody playerRB;
-    [SerializeField]
-    private GameObject floatingTextPrefab;
+    
 
 
 
@@ -48,7 +47,9 @@ public class PlayerController : MonoBehaviour
     public int objectsCollected;
     public TextMeshProUGUI clueText;
     public TextMeshProUGUI gameOverText;
-    
+    [SerializeField]
+    private TextMeshProUGUI floatingText;
+
 
 
     // Start is called before the first frame update
@@ -184,7 +185,7 @@ public class PlayerController : MonoBehaviour
        
         if (isSuccessfulDeath)
         {
-            Destroy(this.gameObject,1.25f);
+            Destroy(this.gameObject,0.25f);
         }
         else
         {
@@ -206,7 +207,7 @@ public class PlayerController : MonoBehaviour
 
         }
         //Deactivate Floating Text on Player's head upon palyer's death
-        floatingTextPrefab.SetActive(false);
+        floatingText.gameObject.SetActive(false);
         // GameOver - text displayed irrespective of isSuccessfulDeath and after all the animations/sounds are played.
         gameOverText.gameObject.SetActive(true);
         
@@ -330,10 +331,8 @@ public class PlayerController : MonoBehaviour
         Debug.Log("Objects collected before -" + objectsCollected);
         objectsCollected =objectsCollected+1;
         Debug.Log("Objects collected after -" + objectsCollected);
-        //GameObject parentFloatingText = Instantiate(floatingTextPrefab, new Vector3(transform.position.x, transform.position.y + 3, transform.position.z), Quaternion.identity);
-        //parentFloatingText.GetComponentInChildren<TextMesh>().text = (objectsCollected).ToString()+"/5";
-
-        floatingTextPrefab.GetComponentInChildren<TextMesh>().text = (objectsCollected).ToString() + "/5";
+        
+        floatingText.text = (objectsCollected).ToString() + "/5";
         //Destroy(floatingTextPrefab, 1);
 
         if(objectsCollected == 5)
@@ -348,10 +347,7 @@ public class PlayerController : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
-    public void StartGame()
-    {
-        SceneManager.LoadScene(1);
-    }
+   
 
 
 }
