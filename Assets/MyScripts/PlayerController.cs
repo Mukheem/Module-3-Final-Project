@@ -47,6 +47,7 @@ public class PlayerController : MonoBehaviour
     public int objectsCollected;
     public TextMeshProUGUI clueText;
     public TextMeshProUGUI gameOverText;
+    public Button restartGameButton;
     [SerializeField]
     private TextMeshProUGUI floatingText;
 
@@ -210,7 +211,9 @@ public class PlayerController : MonoBehaviour
         floatingText.gameObject.SetActive(false);
         // GameOver - text displayed irrespective of isSuccessfulDeath and after all the animations/sounds are played.
         gameOverText.gameObject.SetActive(true);
-        
+        // Restart Game - button displayed irrespective of isSuccessfulDeath and after all the animations/sounds are played.
+        restartGameButton.gameObject.SetActive(true);
+
 
     }
 

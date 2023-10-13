@@ -20,4 +20,8 @@ public class Main_Menu : MonoBehaviour
     {
         SceneManager.LoadScene(1);
     }
+    public void ReStartGame()
+    {
+        SceneManager.LoadScene(0);
+    }
 }
