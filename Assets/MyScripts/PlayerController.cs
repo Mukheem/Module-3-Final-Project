@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
     public float movingSpeed = 40000;
     public float turningSpeed = 0.27f;
     public float jumpSpeed = 90000;
-    private float jumpRestTimer = 3.5f;
+    private float jumpRestTimer = 3f;
 
 
     // Component Variables
@@ -65,6 +65,11 @@ public class PlayerController : MonoBehaviour
         transform.position = new Vector3(98.0f, 24f, -65f);
         this.transform.Rotate(0, 130, 0);
 
+        //Component initializations
+        spawnManager = GameObject.Find("Spawn Manager").GetComponent<SpawnManager>();
+        gameBGM = GameObject.Find("Main Camera").GetComponent<AudioSource>();
+        playerAudioSource = GetComponent<AudioSource>();
+
         // Player variables initializations
         playerAnimator = GetComponent<Animator>();
         playerRB = GetComponent<Rigidbody>();
@@ -84,10 +89,7 @@ public class PlayerController : MonoBehaviour
         objectsCollected = 0;
         clueText.text = "Go, get all the objects before health runs out.";
 
-        //Component initializations
-        spawnManager = GameObject.Find("Spawn Manager").GetComponent<SpawnManager>();
-        gameBGM = GameObject.Find("Main Camera").GetComponent<AudioSource>();
-        playerAudioSource = GetComponent<AudioSource>();
+       
 
         //Disabling the powerup ParticleFX so that it does not keep on playing.
         playerPowerupFX.transform.parent.gameObject.SetActive(false);
@@ -105,6 +107,8 @@ public class PlayerController : MonoBehaviour
         //Making sure that Indicator is always showing right color
         HealthColurIndicator();
 
+        // Keeps checking if health is <50. If yes, then Speed is reduced also the Jump wait time increases
+        ReduceSpeed();
 
         //Restart Game
         if (Input.GetKey(KeyCode.R))
@@ -169,7 +173,7 @@ public class PlayerController : MonoBehaviour
             playerAnimator.SetBool("Static_b", true);
             playerAnimator.SetFloat("Speed_f", 0);
 
-            playerDirtSplatterParticlFX.Stop(); // Dirst Splatter Stop
+            playerDirtSplatterParticlFX.Stop(); // Dirt Splatter Stop
         }
 
 
@@ -280,41 +284,43 @@ public class PlayerController : MonoBehaviour
         Debug.Log("Game Object Name is - " + other.gameObject.name);
         if (other.tag.StartsWith("Powerup"))
         {
+            //Letting know SpawnManager that there is no powerup in the scene.
+            spawnManager.hasOnePowerupInScene = false; 
             //Enabling the powerup ParticleFX
             playerPowerupFX.transform.parent.gameObject.SetActive(true);
-
-            spawnManager.hasOnePowerupInScene = false; //Letting know SpawnManager that there is no powerup in the scene.
-            // Playing Player Powerup Collection Visual FX - Visual
+            playerPowerupFX.gameObject.SetActive(true);
+             // Playing Player Powerup Collection Visual FX - Visual
             playerPowerupFX.Play();
             // Playing Player Powerup Collection Sound FX - Audio
             playerAudioSource.PlayOneShot(playerPowerupCollectionSound, 1.0f);
             //Add powerup to Object collection and show score
             IncrementObjectCollectionScoreAndShow();
 
-            //Updating ClueText
-            clueText.text = "Object " + gameObject.name + " collected...";
+            
+            Debug.Log(other.tag + " collected...");
+            
 
-            if (other.gameObject.name.Contains("Apple"))
+            if (other.tag.Contains("Apple"))
             {
                 playerHealth.BarValue += appleHealth;
                 Destroy(other.gameObject);
             }
-            else if (other.gameObject.name.Contains("Milk"))
+            else if (other.tag.Contains("Milk"))
             {
                 playerHealth.BarValue += milkHealth;
                 Destroy(other.gameObject);
             }
-            else if (other.gameObject.name.Contains("Cookie"))
+            else if (other.tag.Contains("Cookie"))
             {
                 playerHealth.BarValue += cookieHealth;
                 Destroy(other.gameObject);
             }
-            else if (other.gameObject.name.Contains("BigBottle"))
+            else if (other.tag.Contains("Bottle"))
             {
                 playerHealth.BarValue += bigbottleHealth;
                 Destroy(other.gameObject);
             }
-            else if (other.gameObject.name.Contains("10000dol"))
+            else if (other.tag.Contains("Money"))
             {
                 playerHealth.BarValue += moneyHealth;
                 Destroy(other.gameObject);
@@ -373,7 +379,7 @@ public class PlayerController : MonoBehaviour
         floatingText.text = (objectsCollected).ToString() + "/5";
 
         // When all the objects are collected hint box is updated with the message so that player moves towards safehouse.
-        if (objectsCollected >= 5)
+        if (objectsCollected == 5)
         {
             //Updating ClueText to - reach Safe house
             clueText.text = "Bravo...Now,Reach SafeHouse before health runs out.";
@@ -384,5 +390,22 @@ public class PlayerController : MonoBehaviour
     public void RestartGame()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    /*
+     * This method decreases the speed of the player also the jump wait time increases when health runs to < 50%
+     */
+    private void ReduceSpeed()
+    {
+        if (playerHealth.BarValue < 50)
+        {
+            movingSpeed = 20000;
+            jumpRestTimer = 4.5f;
+        }
+        else {
+
+            movingSpeed = 40000;
+        jumpRestTimer = 3.0f;
+        }
     }
 }
