@@ -8,14 +8,17 @@ using System.Linq;
 
 public class PlayerController : MonoBehaviour
 {
-    //Movement Variables
+    /*
+    * Global Variable declarations
+    */
+    //Player Movement Variables
     private float horizontalMovement;
     private float forwardMovement;
     public float movingSpeed = 40000;
     public float turningSpeed = 0.27f;
     public float jumpSpeed = 90000;
     private float jumpRestTimer = 3.5f;
-    
+
 
     // Component Variables
     private Animator playerAnimator;
@@ -28,11 +31,11 @@ public class PlayerController : MonoBehaviour
     private AudioSource playerAudioSource;
     private SpawnManager spawnManager;
     private Rigidbody playerRB;
-    
 
 
 
-    // Misellaneous
+
+    // Miscellaneous
     public float gravityModifier;
     public ProgressBarCircle playerHealth;
     private int playerHealthCountdownTimeLimit = 8; //Every 8 seconds, Player looses his/her health.
@@ -57,17 +60,22 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
-        //Player Start Position 
-        //s transform.position = new Vector3(98.0f, 24f, -65f);
-        playerAnimator = GetComponent<Animator>();
-        spawnManager = GameObject.Find("Spawn Manager").GetComponent<SpawnManager>();
-        Physics.gravity *= gravityModifier;
-        playerRB = GetComponent<Rigidbody>();
 
+        //Player Start Position and rotation
+        transform.position = new Vector3(98.0f, 24f, -65f);
+        this.transform.Rotate(0, 130, 0);
+
+        // Player variables initializations
+        playerAnimator = GetComponent<Animator>();
+        playerRB = GetComponent<Rigidbody>();
+        Physics.gravity *= gravityModifier;
         playerHealth.BarValue = 99;//Health value Initialisation
+
+
+        // Starting the health Counter
         StartCoroutine("PlayerHealthCounter");
 
+        //Miscellaneous
         isGameOver = false;
         canPlayerJump = true;
         jumpIndicator.gameObject.SetActive(true);
@@ -76,26 +84,23 @@ public class PlayerController : MonoBehaviour
         objectsCollected = 0;
         clueText.text = "Go, get all the objects before health runs out.";
 
+        //Component initializations
+        spawnManager = GameObject.Find("Spawn Manager").GetComponent<SpawnManager>();
         gameBGM = GameObject.Find("Main Camera").GetComponent<AudioSource>();
         playerAudioSource = GetComponent<AudioSource>();
 
-        //Disabling the powerup ParticleFX
+        //Disabling the powerup ParticleFX so that it does not keep on playing.
         playerPowerupFX.transform.parent.gameObject.SetActive(false);
 
     }
 
 
-    
+
     // Update is called once per frame
     void Update()
     {
-        
-        // Movement of the player
-        horizontalMovement = Input.GetAxis("Horizontal");
-        forwardMovement = Input.GetAxis("Vertical");
-
-        // This condition controls the rotation of the player while moving.
-        transform.Rotate(Vector3.up, horizontalMovement * turningSpeed);
+        // Controls all the player movements and also player movement particle FX
+        PlayerMovementControls();
 
         //Making sure that Indicator is always showing right color
         HealthColurIndicator();
@@ -107,52 +112,66 @@ public class PlayerController : MonoBehaviour
             RestartGame();
         }
 
+
+
+    }
+
+    /*
+     * This method controls all the player movements and related particle FX
+     */
+    private void PlayerMovementControls()
+    {
+        // Movement of the player
+        horizontalMovement = Input.GetAxis("Horizontal");
+        forwardMovement = Input.GetAxis("Vertical");
+
+        // This condition controls the rotation of the player while moving.
+        transform.Rotate(Vector3.up, horizontalMovement * turningSpeed);
+
         // This condition controls the movement of the player while moving.
         if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W))
+        {
+            // This condition is to slowdown the speed of the palyer when he is in the air
+            if (playerRB.velocity.magnitude < velocityLimit && !canPlayerJump)
             {
-                // This condition is to slowdown the speed of the palyer when he is in the air
-                if (playerRB.velocity.magnitude < velocityLimit && !canPlayerJump)
-                {
-                    playerRB.AddForce(transform.forward * Time.deltaTime * movingSpeed, ForceMode.Force);
-                    playerRB.AddForce(Vector3.down * Time.deltaTime * movingSpeed, ForceMode.Force);
-                }
-                else
-                    playerRB.AddForce(transform.forward * Time.deltaTime * movingSpeed, ForceMode.Force);
+                playerRB.AddForce(transform.forward * Time.deltaTime * movingSpeed, ForceMode.Force);
+                playerRB.AddForce(Vector3.down * Time.deltaTime * movingSpeed, ForceMode.Force);
+            }
+            else
+                playerRB.AddForce(transform.forward * Time.deltaTime * movingSpeed, ForceMode.Force);
 
         }
-            else if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S))
-            {
-                playerRB.AddForce(-transform.forward * Time.deltaTime * movingSpeed, ForceMode.Force);
-            }
+        else if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S))
+        {
+            playerRB.AddForce(-transform.forward * Time.deltaTime * movingSpeed, ForceMode.Force);
+        }
 
-            // This condition controls the Jump of the player while moving.
-            if (Input.GetKey(KeyCode.Space) && canPlayerJump)
-            {
-                canPlayerJump = false;
-                jumpIndicator.gameObject.SetActive(false);
-                StartCoroutine(JumpCounter());
-                playerRB.AddForce(transform.up * Time.deltaTime * jumpSpeed, ForceMode.Impulse);
-            }
+        // This condition controls the Jump of the player while moving.
+        if (Input.GetKey(KeyCode.Space) && canPlayerJump)
+        {
+            canPlayerJump = false;
+            jumpIndicator.gameObject.SetActive(false);
+            StartCoroutine(JumpCounter());
+            playerRB.AddForce(transform.up * Time.deltaTime * jumpSpeed, ForceMode.Impulse);
+        }
 
-            // This condition controls the animation and also DirtSPlatter of the player while moving.
-            if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.S))
-            {
-                playerAnimator.SetBool("Static_b", false);
-                playerAnimator.SetFloat("Speed_f", movingSpeed);
+        // This condition controls the animation and also DirtSPlatter of the player while moving.
+        if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.S))
+        {
+            playerAnimator.SetBool("Static_b", false);
+            playerAnimator.SetFloat("Speed_f", movingSpeed);
 
-                playerDirtSplatterParticlFX.Play(); // Dirst Splatter Play
+            playerDirtSplatterParticlFX.Play(); // Dirst Splatter Play
 
-            }
-            else if (Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.DownArrow) || Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.S))
-            {
-                playerAnimator.SetBool("Static_b", true);
-                playerAnimator.SetFloat("Speed_f", 0);
+        }
+        else if (Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.DownArrow) || Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.S))
+        {
+            playerAnimator.SetBool("Static_b", true);
+            playerAnimator.SetFloat("Speed_f", 0);
 
-                playerDirtSplatterParticlFX.Stop(); // Dirst Splatter Stop
-            }
-        
+            playerDirtSplatterParticlFX.Stop(); // Dirst Splatter Stop
+        }
 
-      
 
     }
 
@@ -186,22 +205,20 @@ public class PlayerController : MonoBehaviour
     {
         // GameOver - Set to true irrespective of isSuccessfulDeath
         isGameOver = true;
-       
+
         if (isSuccessfulDeath)
         {
-            Destroy(this.gameObject,0.25f);
+            Destroy(this.gameObject, 0.25f);
         }
         else
         {
-            
+
             // Play death Aimation
             playerAnimator.SetBool("Death_b", true);
             playerAnimator.SetInteger("DeathType_int", 2);
             // Turning off the low-health indicating sound.
             playerHealth.repeat = false;
             playerHealth.sound = null;
-            // Stop BGM
-            gameBGM.Stop();
             // Playing Player Death Explosion FX - Visual
             playerExplosionParticleFX.Play();
             // Playing Player Death Sound FX - Audio
@@ -210,6 +227,8 @@ public class PlayerController : MonoBehaviour
             playerHealth.BarValue = 0;
 
         }
+        // Stop BGM
+        gameBGM.Stop();
         //Deactivate Floating Text on Player's head upon palyer's death
         floatingText.gameObject.SetActive(false);
         // GameOver - text displayed irrespective of isSuccessfulDeath and after all the animations/sounds are played.
@@ -223,7 +242,7 @@ public class PlayerController : MonoBehaviour
     // Health Bar color codes and conditions
     private void HealthColurIndicator()
     {
-        
+
         if (playerHealth.BarValue > 75 && playerHealth.BarValue < 91)
         {
             playerHealth.BarBackGroundColor = Color.green; // Olive Green
@@ -252,6 +271,9 @@ public class PlayerController : MonoBehaviour
     }
 
 
+    /*
+     * This method handles all the operations when player colldes with different objects like powerups,DyingZone and safehouse in the scene
+     */
     private void OnTriggerEnter(Collider other)
     {
 
@@ -260,7 +282,7 @@ public class PlayerController : MonoBehaviour
         {
             //Enabling the powerup ParticleFX
             playerPowerupFX.transform.parent.gameObject.SetActive(true);
-            
+
             spawnManager.hasOnePowerupInScene = false; //Letting know SpawnManager that there is no powerup in the scene.
             // Playing Player Powerup Collection Visual FX - Visual
             playerPowerupFX.Play();
@@ -273,7 +295,7 @@ public class PlayerController : MonoBehaviour
             clueText.text = "Object " + gameObject.name + " collected...";
 
             if (other.gameObject.name.Contains("Apple"))
-            {                
+            {
                 playerHealth.BarValue += appleHealth;
                 Destroy(other.gameObject);
             }
@@ -307,7 +329,7 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Player died falling off island");
             PlayerDeath(false);
         }
-        if (other.CompareTag("SafeHouse") && objectsCollected ==5)
+        if (other.CompareTag("SafeHouse") && objectsCollected == 5)
         {
             //Updating ClueText
             clueText.text = "Goal achieved";
@@ -315,6 +337,9 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    /*
+     * This methods drains down the health of the player to as minimum as 20% as long as the player is in contact with poisonous gas
+     */
     private void OnTriggerStay(Collider other)
     {
         if (other.CompareTag("Poison") && playerHealth.BarValue > 20)
@@ -323,44 +348,41 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    /*
+     * This co-routine handles the jumping mechanism. Player can't jump until the said time is met
+     */
     private IEnumerator JumpCounter()
     {
-        
+
         yield return new WaitForSeconds(jumpRestTimer);
         canPlayerJump = true;
         jumpIndicator.gameObject.SetActive(true);
     }
 
-    
 
+    /*
+     * This methods increments the floating text which shows the remaining number of objects to be collected
+     */
     private void IncrementObjectCollectionScoreAndShow()
     {
         Debug.Log("Objects collected before -" + objectsCollected);
-        objectsCollected =objectsCollected+1;
+        if(objectsCollected != 5)
+            objectsCollected = objectsCollected + 1;
         Debug.Log("Objects collected after -" + objectsCollected);
-        
-        floatingText.text = (objectsCollected).ToString() + "/5";
-        //Destroy(floatingTextPrefab, 1);
 
-        if(objectsCollected == 5)
+        floatingText.text = (objectsCollected).ToString() + "/5";
+
+        // When all the objects are collected hint box is updated with the message so that player moves towards safehouse.
+        if (objectsCollected >= 5)
         {
             //Updating ClueText to - reach Safe house
             clueText.text = "Bravo...Now,Reach SafeHouse before health runs out.";
         }
     }
 
+    // Restarts game at any point while player is playing the game.
     public void RestartGame()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
-
-   
-
-
 }
-
-
-
-
-
-// Floating Text doesnot update on the fly and the object is not deactivated upon playeräs death

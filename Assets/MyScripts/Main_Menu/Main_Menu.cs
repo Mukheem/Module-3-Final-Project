@@ -5,21 +5,16 @@ using UnityEngine.SceneManagement;
 
 public class Main_Menu : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    /*
+     * Method to Start the game scene
+     */
     public void StartGame()
     {
         SceneManager.LoadScene(1);
     }
+    /*
+     * Method to Re-Start the game scene after the player finishes the play.
+     */
     public void ReStartGame()
     {
         SceneManager.LoadScene(0);

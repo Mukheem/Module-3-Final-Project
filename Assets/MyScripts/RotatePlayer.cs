@@ -4,13 +4,11 @@ using UnityEngine;
 
 public class RotatePlayer : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    
 
-    // Update is called once per frame
+    /*
+     * This method keeps the player rotating during intro scene.
+     */
     void Update()
     {
         transform.Rotate(0, 60 * Time.deltaTime,0 );
