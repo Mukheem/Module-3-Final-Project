@@ -32,7 +32,9 @@ public class SpawnManager : MonoBehaviour
         int powerupLoopingVariable = 0; // variable to ensure that the coroutine is iterated "powerups.length" number of times.
         while (powerupLoopingVariable < powerups.Length)
         {
-            // Condition to wait until is that the existing powerup is destroyed.
+            /* Condition to wait until is that the existing powerup is destroyed.
+            /* https://vionixstudio.com/2021/04/03/unity-coroutine-tutorial/#Make_Unity_coroutine_Wait_Until_a_condition_is_true
+            */
             yield return new WaitUntil(() => hasOnePowerupInScene == false);
             //Method which selects powerups randomly.
             SelectPowerupRandomly();
