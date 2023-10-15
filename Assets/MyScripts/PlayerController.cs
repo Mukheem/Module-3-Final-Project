@@ -16,7 +16,7 @@ public class PlayerController : MonoBehaviour
     private float forwardMovement;
     public float movingSpeed = 40000;
     public float turningSpeed = 0.27f;
-    public float jumpSpeed = 90000;
+    public float jumpSpeed = 80000;
     private float jumpRestTimer = 3f;
 
 
@@ -96,7 +96,11 @@ public class PlayerController : MonoBehaviour
 
     }
 
-
+    private void FixedUpdate()
+    {
+        //Making sure that Indicator is always showing right color
+        HealthColurIndicator();
+    }
 
     // Update is called once per frame
     void Update()
@@ -104,9 +108,7 @@ public class PlayerController : MonoBehaviour
         // Controls all the player movements and also player movement particle FX
         PlayerMovementControls();
 
-        //Making sure that Indicator is always showing right color
-        HealthColurIndicator();
-
+        
         // Keeps checking if health is <50. If yes, then Speed is reduced also the Jump wait time increases
         ReduceSpeed();
 

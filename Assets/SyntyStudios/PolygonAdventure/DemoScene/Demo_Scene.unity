@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 345807181}
-  m_IndirectSpecularColor: {r: 0.16859762, g: 0.18165265, b: 0.2417971, a: 1}
+  m_IndirectSpecularColor: {r: 0.43087634, g: 0.44696933, b: 0.51922107, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -43252,7 +43252,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   movingSpeed: 40000
   turningSpeed: 0.27
-  jumpSpeed: 90000
+  jumpSpeed: 80000
   playerExplosionParticleFX: {fileID: 1260913569}
   playerDirtSplatterParticlFX: {fileID: 2378184072763280172}
   playerPowerupFX: {fileID: 1663861244}
