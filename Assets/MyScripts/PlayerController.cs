@@ -401,12 +401,12 @@ public class PlayerController : MonoBehaviour
     {
         if (playerHealth.BarValue < 50)
         {
-            movingSpeed = 20000;
+            movingSpeed = 25000;
             jumpRestTimer = 4.5f;
         }
         else {
 
-            movingSpeed = 40000;
+            movingSpeed = 37000;
         jumpRestTimer = 3.0f;
         }
     }

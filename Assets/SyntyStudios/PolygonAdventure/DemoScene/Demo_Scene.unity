@@ -43230,7 +43230,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1420895747}
   serializedVersion: 2
-  m_Mass: 60
+  m_Mass: 74
   m_Drag: 0
   m_AngularDrag: 0
   m_UseGravity: 1
@@ -43250,7 +43250,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c019abf03a4f14fa3aca92ca1c35eb61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movingSpeed: 40000
+  movingSpeed: 35000
   turningSpeed: 0.27
   jumpSpeed: 80000
   playerExplosionParticleFX: {fileID: 1260913569}
